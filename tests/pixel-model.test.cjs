@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');
+const PixelDocument=require('../dist/pixel-model.js');
+const p=new PixelDocument();assert.equal(p.frames.length,16);assert(p.frames.flat().every(c=>c===-1));
+p.checkpoint();p.line(0,0,0,47,47,0xff0033);for(let i=0;i<48;i++)assert.equal(p.frames[0][i*48+i],0xff0033);assert(p.frames[1].every(c=>c===-1));
+p.undo();assert(p.frames[0].every(c=>c===-1));p.redo();assert.equal(p.frames[0][0],0xff0033);
+p.checkpoint();p.pixel(0,0,0,-1);assert.equal(p.frames[0][0],-1);p.undo();assert.equal(p.frames[0][0],0xff0033);
+p.checkpoint();p.pixel(3,2,4,0x345678,2,true);assert.equal(p.frames[3][4*48+45],0x345678);assert.equal(p.frames[3][5*48+44],0x345678);
+const fill=new PixelDocument();for(let y=0;y<48;y++)fill.pixel(0,24,y,0);fill.fill(0,0,0,0xaabbcc);assert.equal(fill.frames[0][47*48+23],0xaabbcc);assert.equal(fill.frames[0][25],-1);assert.equal(fill.frames[0][24],0);fill.fill(0,0,0,0xaabbcc);
+const restored=new PixelDocument(JSON.parse(JSON.stringify(p.frames)));assert.deepEqual(restored.frames,p.frames);restored.frames[0][0]=55;assert.notEqual(restored.frames[0][0],p.frames[0][0]);
+const before=p.frames.map(f=>f.slice());p.replace(PixelDocument.blank());p.undo();assert.deepEqual(p.frames,before);p.redo();assert(p.frames.flat().every(c=>c===-1));p.checkpoint();p.pixel(0,1,1,4);assert.equal(p.redoStack.length,0);
+assert.throws(()=>PixelDocument.validate([]));const bad=PixelDocument.blank();bad[0][0]=16777216;assert.throws(()=>PixelDocument.validate(bad));bad[0][0]=-2;assert.throws(()=>PixelDocument.validate(bad));
+console.log('PASS: blank creation, continuous strokes, frame isolation, transparency, mirror, bounded flood fill, undo/redo, replacement recovery, save/load round trip, malformed file rejection.');

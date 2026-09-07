@@ -1,0 +1,11 @@
+# Local tools and temporary files
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+!.env.example
+
+# Each deployed fork should use its own Sites binding.
+.openai/hosting.json
