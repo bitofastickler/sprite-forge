@@ -6,6 +6,8 @@ Sprite Forge is a lightweight, browser-based character creator for top-down 2D g
 
 Built with plain HTML, CSS, JavaScript, and Canvas. No build step, runtime dependencies, API keys, or AI service required.
 
+**[Open Sprite Forge](https://bitofastickler.github.io/sprite-forge/)** — use the character studio directly in your browser.
+
 ## Features
 
 ### Generate a starting character
@@ -108,6 +110,8 @@ node tests/pixel-model.test.cjs
 The checks cover blank creation, continuous strokes, frame isolation, erasing, mirrored painting, bounded flood fill, undo/redo, replacement recovery, JSON pixel-data round trips, and malformed pixel-data rejection. They do not replace browser interaction or visual testing.
 
 ## Hosting
+
+The public app is hosted on [GitHub Pages](https://bitofastickler.github.io/sprite-forge/). The workflow in `.github/workflows/pages.yml` checks the JavaScript and pixel model, then publishes `dist/` whenever changes are pushed to `main`. It can also be run manually from GitHub Actions.
 
 Serve the contents of `dist/` with a static web host. No server process, database, secrets, or environment variables are needed by the application.
 
