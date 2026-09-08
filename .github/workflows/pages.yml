@@ -25,10 +25,7 @@ jobs:
         uses: actions/checkout@v6
       - name: Check JavaScript and pixel model
         run: |
-          node --check dist/app.js
-          node --check dist/pixel-model.js
-          node --check dist/palette-state.js
-          node tests/pixel-model.test.cjs
+          node tests/run.cjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site

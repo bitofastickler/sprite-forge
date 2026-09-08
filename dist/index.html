@@ -1,5 +1,745 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sprite Forge — Character studio</title><meta name="description" content="Create customizable top-down pixel characters and export game-ready transparent sprite sheets."><link rel="stylesheet" href="style.css"></head><body>
-<header><div class="brand"><span class="mark">▦</span> SPRITE FORGE <span class="badge">CHARACTER STUDIO</span></div><button id="random">↻ Randomize</button></header>
-<main><section class="workspace"><div class="title"><div><p class="eyebrow">YOUR NEXT ADVENTURER</p><h1>Small pixels. Big character.</h1></div><span class="spec">48 × 48 PX<br>4 DIRECTIONS</span></div><div class="creation-actions"><button class="primary" id="edit-generated">✎ Edit generated character</button><button id="start-blank">＋ Start from scratch</button><button id="show-generator" hidden>Generator</button><button id="resume-edit" hidden>Resume pixel editor</button></div>
-<section id="pixel-editor" hidden aria-label="Pixel editor"><div class="editor-heading"><h2>Pixel editor</h2><span id="frame-name"></span></div><div class="tools" role="group" aria-label="Drawing tools"><button data-tool="pencil" class="active" aria-pressed="true">Pencil (B)</button><button data-tool="eraser">Eraser (E)</button><button data-tool="fill">Fill (F)</button><button data-tool="picker">Eyedropper (I)</button><label class="paint-color">Color<input id="paint-color" type="color" value="#b9ed83"></label><label>Brush<select id="brush"><option value="1">1 px</option><option value="2">2 px</option><option value="3">3 px</option><option value="5">5 px</option></select></label></div><div id="palette" aria-label="Character palette"></div><div class="canvas-scroll"><canvas id="paint" width="576" height="576" tabindex="0" role="img" aria-label="Pixel drawing canvas. Use arrow keys to move the cursor and Space to use the selected tool."></canvas></div><div class="tools"><button id="undo" disabled>Undo</button><button id="redo" disabled>Redo</button><label class="check"><input id="grid" type="checkbox" checked> Grid</label><label class="check"><input id="onion" type="checkbox"> Previous frame</label><label class="check"><input id="mirror" type="checkbox"> Mirror brush</label></div><div id="frames" role="group" aria-label="Animation frames"></div><div class="tools"><button id="copy-frame">Copy frame</button><button id="paste-frame" disabled>Paste frame</button><button id="copy-row">Copy to this direction’s 4 frames</button><button id="clear-frame">Clear frame</button></div><p class="hint">Draw with a mouse or touch. Each frame is edited separately. Copy a frame to start the next pose; use Previous frame as a guide. Undo also restores cleared or replaced artwork. Save character keeps all pixels.</p><p id="edit-status" role="status" aria-live="polite"></p></section><div class="stage"><span class="stage-label">LIVE PREVIEW</span><canvas id="preview" width="48" height="48" aria-label="Animated character preview"></canvas><span class="stage-note">Original procedural pixel art</span></div><div class="transport"><div id="directions" role="group" aria-label="Facing direction"><button data-dir="2">↑</button><button data-dir="1">←</button><button data-dir="0" class="active">↓</button><button data-dir="3">→</button></div><button id="play" aria-pressed="true">Ⅱ Pause walk</button><label class="speed">Speed <input id="speed" type="range" min="2" max="12" value="6" aria-label="Animation frames per second"></label></div><div class="sheet-heading"><h2>Walking sprite sheet</h2><span>4 frames × 4 directions · 192 × 192 px</span></div><div class="sheet-wrap"><div class="row-labels"><span>DOWN</span><span>LEFT</span><span>UP</span><span>RIGHT</span></div><canvas id="sheet" width="192" height="192" aria-label="Four-direction walking sprite sheet"></canvas></div><p class="hint">Rows: down, left, up, right. Each row loops through four walking frames. Transparency is preserved on export.</p></section>
-<aside><div class="panel-title"><h2>Make it yours</h2><span>01 / CHARACTER</span></div><form id="controls"><label>Body build<select name="build"><option value="standard">Standard</option><option value="slim">Slender</option><option value="broad">Broad</option></select></label><div class="pair"><label>Skin<input name="skin" type="color" value="#dca477"></label><label>Eyes<input name="eyes" type="color" value="#315466"></label></div><label>Hair style<select name="hair"><option value="swept">Side swept</option><option value="short">Cropped</option><option value="long">Long</option><option value="mohawk">Mohawk</option><option value="bald">Bald</option></select></label><label class="color-row">Hair color<input name="hairColor" type="color" value="#543a34"></label><hr><label>Outfit<select name="outfit"><option value="tunic">Traveler's tunic</option><option value="armor">Plate armor</option><option value="robe">Mage's robe</option></select></label><div class="pair"><label>Clothing<input name="cloth" type="color" value="#4a8e79"></label><label>Trim<input name="trim" type="color" value="#e5be70"></label></div><label>Headwear<select name="hat"><option value="none">None</option><option value="hood">Hood</option><option value="helmet">Iron helmet</option><option value="wizard">Wizard hat</option></select></label><label>Equipment<select name="weapon"><option value="none">Empty hands</option><option value="sword">Sword</option><option value="staff">Crystal staff</option><option value="axe">Axe</option></select></label><label class="check"><input name="cape" type="checkbox"> Add a cape</label><label class="color-row">Cape color<input name="capeColor" type="color" value="#a54d5b"></label></form><div class="export"><p class="eyebrow">READY FOR YOUR GAME</p><button class="primary" id="export-sheet">↓ Export sprite sheet</button><button id="export-frame">Export current frame</button><div class="pair"><button id="save">Save character</button><button id="load">Load character</button></div><input id="file" type="file" accept="application/json,.json" hidden><p>PNG · Transparent background · Native resolution</p></div><div id="status" role="status" aria-live="polite"></div></aside></main><footer>SPRITE FORGE <span>Layer-based creation · No AI service or account required</span></footer><script src="pixel-model.js"></script><script src="app.js"></script><script src="palette-state.js"></script></body></html>
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sprite Forge — A little canvas. Endless possibilities.</title>
+    <meta
+      name="description"
+      content="A welcoming pixel art studio. Draw sprites, build characters, animate, and export game-ready artwork. No account needed."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <button id="home-button" class="brand" aria-label="Sprite Forge home">
+        <span class="brand-mark" aria-hidden="true">▦</span
+        ><span>SPRITE <b>FORGE</b></span>
+      </button>
+      <div id="project-heading" hidden>
+        <input
+          id="project-name"
+          aria-label="Project name"
+          maxlength="120"
+        /><span id="save-state" role="status">Not saved yet</span>
+      </div>
+      <div class="top-actions">
+        <button id="theme" class="quiet" aria-label="Switch to light theme">
+          Light theme</button
+        ><button id="help" class="quiet">Quick guide</button
+        ><button id="open" class="quiet">Open</button
+        ><button id="download-project" hidden>Save project file</button
+        ><button id="export" class="primary" hidden>Export ↗</button>
+      </div>
+    </header>
+    <main id="home">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">YOUR NEXT LITTLE MASTERPIECE</p>
+          <h1>A little canvas.<br /><span>Endless possibilities.</span></h1>
+          <p class="hero-copy">
+            Turn a small idea into a sprite that's all yours.<br />Start simple.
+            Make a mark. See where it goes.
+          </p>
+          <div class="hero-notes">
+            <span>✦ No account needed</span><span>✦ Yours to export</span
+            ><span>✦ Made for beginners</span>
+          </div>
+        </div>
+        <div class="hero-art">
+          <div class="art-label">SMALL IDEAS, PIXEL BY PIXEL</div>
+          <canvas
+            id="hero-canvas"
+            width="112"
+            height="80"
+            aria-label="Examples of pixel art: a potion, creature, flower, and gem"
+          ></canvas>
+        </div>
+      </section>
+      <section class="start-grid" aria-label="Start creating">
+        <button id="new-sprite" class="start-card">
+          <span class="card-icon">✎</span
+          ><strong>Draw a sprite <span>↗</span></strong
+          ><span>Your idea, a blank canvas, and all the right tools.</span></button
+        ><button id="new-character" class="start-card">
+          <span class="card-icon">♟</span
+          ><strong>Build a character <span>↗</span></strong
+          ><span>Find your adventurer. Make every pixel your own.</span></button
+        ><button id="open-artwork" class="start-card">
+          <span class="card-icon">▧</span
+          ><strong>Open artwork <span>↗</span></strong
+          ><span>Bring a PNG or pick up an editable project.</span>
+        </button>
+      </section>
+      <section class="home-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">A LITTLE HEAD START</p>
+            <h2>Make something small. Learn something new.</h2>
+          </div>
+          <span class="muted">Original, editable starter art</span>
+        </div>
+        <div id="examples" class="example-grid"></div>
+      </section>
+      <section class="home-section">
+        <div class="section-heading">
+          <h2>Your recent projects</h2>
+          <span class="muted">Saved on this device</span>
+        </div>
+        <div id="recent" class="recent-grid">
+          <p class="muted">
+            Your next creation starts here. Projects appear after their first
+            save.
+          </p>
+        </div>
+      </section>
+      <footer>
+        Built for the joy of making things.<span
+          >Pixels stay on your device. Keep a project file as a backup.</span
+        >
+      </footer>
+    </main>
+    <main id="editor" hidden>
+      <div class="contextbar">
+        <div class="history-actions">
+          <button id="undo" aria-label="Undo (Ctrl Z)" title="Undo (Ctrl Z)">
+            ↶</button
+          ><button
+            id="redo"
+            aria-label="Redo (Ctrl Shift Z)"
+            title="Redo (Ctrl Shift Z)"
+          >
+            ↷
+          </button>
+        </div>
+        <span id="tool-name">Pencil</span
+        ><label id="brush-option"
+          >Size
+          <select id="brush">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>5</option>
+            <option>8</option>
+          </select>
+          px</label
+        ><label id="solid-option" hidden
+          ><input id="solid" type="checkbox" /> Filled shape</label
+        ><label id="symmetry-option"
+          >Mirror
+          <select id="symmetry">
+            <option value="none">Off</option>
+            <option value="horizontal">Left / right</option>
+            <option value="vertical">Top / bottom</option>
+            <option value="both">Both axes</option>
+          </select></label
+        ><label id="perfect-option"
+          ><input type="checkbox" id="pixel-perfect" /> Clean corners</label
+        ><span id="scope" class="scope"></span
+        ><button id="inspector-toggle" class="quiet">Colors & layers</button>
+      </div>
+      <div class="studio-layout">
+        <nav class="toolrail" aria-label="Drawing tools">
+          <div id="main-tools"></div>
+          <details id="more-tools">
+            <summary>More tools</summary>
+            <div id="extra-tools"></div>
+          </details>
+          <div class="rail-bottom">
+            <button id="resize">Canvas size</button
+            ><button id="transform">Transform</button
+            ><button id="reference">Reference</button>
+          </div>
+        </nav>
+        <section class="work-area" aria-label="Drawing workspace">
+          <div id="lesson" hidden>
+            <div>
+              <span id="lesson-label" class="eyebrow"></span
+              ><strong id="lesson-title"></strong>
+              <p id="lesson-text"></p>
+            </div>
+            <div class="row">
+              <button id="lesson-back">Back</button
+              ><button id="lesson-next" class="primary">Next step</button
+              ><button
+                id="lesson-close"
+                class="quiet"
+                aria-label="Close lesson"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          <div class="canvas-heading">
+            <span id="canvas-spec"></span>
+            <div class="row">
+              <label><input id="grid" type="checkbox" checked /> Grid</label
+              ><label><input id="guides" type="checkbox" /> Origin guide</label>
+            </div>
+          </div>
+          <div id="viewport">
+            <div id="canvas-wrap">
+              <canvas
+                id="paint"
+                tabindex="0"
+                role="img"
+                aria-label="Pixel canvas. Arrow keys move the cursor. Space draws. Use the tool buttons to change tools."
+              ></canvas
+              ><canvas id="overlay" aria-hidden="true"></canvas>
+            </div>
+          </div>
+          <div id="selection-bar" hidden>
+            <span id="selection-label">Selection</span
+            ><button id="selection-copy">Copy</button
+            ><button id="selection-cut">Cut</button
+            ><button id="selection-paste">Paste</button
+            ><button id="selection-apply">Apply move</button
+            ><button id="selection-cancel">Cancel</button
+            ><button id="selection-clear">Deselect</button>
+          </div>
+          <div class="canvas-bottom">
+            <span id="coordinates">Ready when you are</span>
+            <div class="row">
+              <button id="zoom-out" aria-label="Zoom out">−</button
+              ><span id="zoom-label">100%</span
+              ><button id="zoom-in" aria-label="Zoom in">+</button
+              ><button id="fit">Fit</button
+              ><button id="animate">Animate</button>
+            </div>
+          </div>
+          <section id="timeline" hidden aria-label="Animation timeline">
+            <div class="timeline-heading">
+              <div class="row">
+                <button id="play" aria-pressed="false">▶ Play</button
+                ><select id="clip" aria-label="Animation clip">
+                  <option value="all">All frames</option></select
+                ><button id="add-clip">Name clip</button>
+              </div>
+              <div class="row">
+                <label
+                  >Frame
+                  <input
+                    id="duration"
+                    type="number"
+                    min="20"
+                    max="10000"
+                    step="10"
+                    value="150"
+                  />
+                  ms</label
+                ><label
+                  ><input id="onion-prev" type="checkbox" /> Previous</label
+                ><label><input id="onion-next" type="checkbox" /> Next</label
+                ><label
+                  >Guide
+                  <input
+                    id="onion-opacity"
+                    type="range"
+                    min="5"
+                    max="70"
+                    value="25"
+                    aria-label="Frame guide opacity"
+                /></label>
+              </div>
+            </div>
+            <div id="frames"></div>
+            <div class="row frame-actions">
+              <button id="duplicate-frame">Duplicate</button
+              ><button id="blank-frame">Blank frame</button
+              ><button id="frame-left">Move earlier</button
+              ><button id="frame-right">Move later</button
+              ><button id="delete-frame">Delete frame</button>
+            </div>
+          </section>
+        </section>
+        <aside id="inspector">
+          <section class="inspector-section">
+            <div class="section-heading">
+              <h2>Preview</h2>
+              <span class="tag">LIVE</span>
+            </div>
+            <div id="preview-stage" class="checker">
+              <canvas id="preview" aria-label="Sprite preview"></canvas>
+            </div>
+            <div class="row preview-options">
+              <select id="preview-bg" aria-label="Preview background">
+                <option value="checker">Transparent</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option></select
+              ><select id="preview-mode" aria-label="Preview mode">
+                <option value="large">Enlarged</option>
+                <option value="native">Native size</option>
+                <option value="tile">Tile repeat</option></select
+              ><label><input id="grayscale" type="checkbox" /> Grayscale</label>
+            </div>
+          </section>
+          <section class="inspector-section">
+            <div class="section-heading">
+              <h2>Your palette</h2>
+              <span id="color-count" class="muted"></span>
+            </div>
+            <div class="active-color">
+              <input
+                id="paint-color"
+                type="color"
+                value="#b9ed83"
+                aria-label="Paint color"
+              />
+              <div>
+                <label for="hex-color">Selected color</label
+                ><input
+                  id="hex-color"
+                  value="#b9ed83"
+                  maxlength="7"
+                  aria-label="Hex color"
+                />
+              </div>
+              <button id="add-color" aria-label="Keep color in palette">
+                +
+              </button>
+            </div>
+            <div id="palette" aria-label="Palette colors"></div>
+            <div class="row">
+              <button id="transparent" class="quiet">⌫ Erase</button
+              ><select id="palette-preset" aria-label="Choose palette">
+                <option value="">Add a palette…</option>
+                <option>Meadow</option>
+                <option>Ember</option>
+                <option>Tide</option>
+                <option>Orchard</option>
+              </select>
+            </div>
+            <div
+              id="color-ramp"
+              aria-label="Shadow, base, and highlight colors"
+            ></div>
+            <details>
+              <summary>Color tools</summary>
+              <div class="stack">
+                <button id="extract-colors">Extract artwork colors</button
+                ><button id="replace-color">Replace color in artwork…</button
+                ><label
+                  ><input type="checkbox" id="palette-lock" /> Use only palette
+                  colors</label
+                >
+              </div>
+            </details>
+          </section>
+          <section class="inspector-section layers-section">
+            <div class="section-heading">
+              <h2>Layers</h2>
+              <button id="add-layer" aria-label="Add layer">+</button>
+            </div>
+            <div id="layers"></div>
+            <label class="layer-opacity"
+              >Opacity
+              <input
+                id="layer-opacity"
+                type="range"
+                min="0"
+                max="100"
+                value="100"
+              /><output id="opacity-value">100%</output></label
+            ><label
+              ><input type="checkbox" id="alpha-lock" /> Paint only existing
+              pixels</label
+            >
+            <details>
+              <summary>Layer actions</summary>
+              <div class="layer-actions">
+                <button id="rename-layer">Rename</button
+                ><button id="duplicate-layer">Duplicate</button
+                ><button id="layer-up">Move up</button
+                ><button id="layer-down">Move down</button
+                ><button id="merge-layer">Merge down</button
+                ><button id="delete-layer">Delete</button>
+              </div>
+            </details>
+          </section>
+          <section id="reference-panel" class="inspector-section" hidden>
+            <div class="section-heading">
+              <h2>Reference</h2>
+              <button id="remove-reference" aria-label="Remove reference">
+                ×
+              </button>
+            </div>
+            <img id="reference-image" alt="Your reference artwork" /><small
+              >Reference only · never exported or saved</small
+            >
+          </section>
+          <button id="generator-variant" hidden>
+            Build a new character variant
+          </button>
+        </aside>
+      </div>
+      <div class="statusbar">
+        <span id="status" role="status" aria-live="polite"
+          >Ready when you are.</span
+        ><span id="document-stats"></span>
+      </div>
+    </main>
+    <dialog id="new-dialog">
+      <form id="new-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">A FRESH START</p>
+            <h2>What will you make?</h2>
+          </div>
+          <button type="button" data-close aria-label="Close">×</button>
+        </div>
+        <p class="muted">
+          Small canvases are a great place to begin. You can add space later.
+        </p>
+        <div id="size-presets" class="preset-grid"></div>
+        <details id="custom-size">
+          <summary>More sizes & custom dimensions</summary>
+          <div class="row">
+            <label
+              >Width
+              <input
+                id="new-width"
+                type="number"
+                min="1"
+                max="256"
+                value="32"
+                required /></label
+            ><span>×</span
+            ><label
+              >Height
+              <input
+                id="new-height"
+                type="number"
+                min="1"
+                max="256"
+                value="32"
+                required /></label
+            ><span>pixels</span>
+          </div>
+        </details>
+        <label class="stack"
+          >Project name
+          <input id="new-name" value="Untitled sprite" maxlength="120" required
+        /></label>
+        <div class="dialog-footer">
+          <span class="muted">One frame. One layer. All yours.</span
+          ><button class="primary" type="submit">Create sprite ↗</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="generator-dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">CHARACTER BUILDER</p>
+          <h2>Your next adventurer</h2>
+        </div>
+        <button data-close aria-label="Close">×</button>
+      </div>
+      <div class="generator-layout">
+        <div>
+          <div class="checker generator-stage">
+            <canvas
+              id="generator-preview"
+              width="48"
+              height="48"
+              aria-label="Generated character"
+            ></canvas>
+          </div>
+          <div class="row">
+            <button id="random-character">Randomize unlocked</button
+            ><select id="character-preset" aria-label="Character preset">
+              <option value="">Choose a preset…</option>
+              <option value="traveler">Traveler</option>
+              <option value="knight">Knight</option>
+              <option value="mage">Mage</option>
+            </select>
+          </div>
+          <p class="muted">48 × 48 · 4 directions · 16 walking frames</p>
+          <label
+            ><input id="lock-look" type="checkbox" /> Keep body & hair when
+            randomizing</label
+          ><label
+            ><input id="lock-colors" type="checkbox" /> Keep colors when
+            randomizing</label
+          >
+          <p class="muted">
+            Creates a new project. Your existing artwork stays in its own
+            project.
+          </p>
+        </div>
+        <div id="generator-controls">
+          <form id="controls">
+            <label
+              >Body build<select name="build">
+                <option value="standard">Standard</option>
+                <option value="slim">Slender</option>
+                <option value="broad">Broad</option>
+              </select></label
+            >
+            <div class="pair">
+              <label
+                >Skin<input name="skin" type="color" value="#dca477" /></label
+              ><label
+                >Eyes<input name="eyes" type="color" value="#315466"
+              /></label>
+            </div>
+            <label
+              >Hair style<select name="hair">
+                <option value="swept">Side swept</option>
+                <option value="short">Cropped</option>
+                <option value="long">Long</option>
+                <option value="mohawk">Mohawk</option>
+                <option value="bald">Bald</option>
+              </select></label
+            ><label class="color-row"
+              >Hair color<input name="hairColor" type="color" value="#543a34"
+            /></label>
+            <hr />
+            <label
+              >Outfit<select name="outfit">
+                <option value="tunic">Traveler's tunic</option>
+                <option value="armor">Plate armor</option>
+                <option value="robe">Mage's robe</option>
+              </select></label
+            >
+            <div class="pair">
+              <label
+                >Clothing<input
+                  name="cloth"
+                  type="color"
+                  value="#4a8e79" /></label
+              ><label
+                >Trim<input name="trim" type="color" value="#e5be70"
+              /></label>
+            </div>
+            <label
+              >Headwear<select name="hat">
+                <option value="none">None</option>
+                <option value="hood">Hood</option>
+                <option value="helmet">Iron helmet</option>
+                <option value="wizard">Wizard hat</option>
+              </select></label
+            ><label
+              >Equipment<select name="weapon">
+                <option value="none">Empty hands</option>
+                <option value="sword">Sword</option>
+                <option value="staff">Crystal staff</option>
+                <option value="axe">Axe</option>
+              </select></label
+            ><label class="check"
+              ><input name="cape" type="checkbox" /> Add a cape</label
+            ><label class="color-row"
+              >Cape color<input name="capeColor" type="color" value="#a54d5b"
+            /></label>
+          </form>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <span class="muted">Every generated pixel is editable.</span
+        ><button id="create-character" class="primary">
+          Make this character ↗
+        </button>
+      </div>
+    </dialog>
+    <dialog id="export-dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">TAKE IT WITH YOU</p>
+          <h2>Export your artwork</h2>
+        </div>
+        <button data-close aria-label="Close">×</button>
+      </div>
+      <div class="export-layout">
+        <div class="checker export-stage">
+          <canvas id="export-preview" aria-label="Export preview"></canvas>
+        </div>
+        <div class="stack">
+          <label
+            >Export as
+            <select id="export-type">
+              <option value="frame">Image · current frame PNG</option>
+              <option value="sheet">Game sprite sheet · PNG + JSON</option>
+              <option value="gif">Animation · shareable GIF</option>
+              <option value="sequence">Animation · numbered PNG files</option>
+            </select></label
+          ><label
+            >Scale
+            <select id="export-scale">
+              <option value="1">1× · native pixels</option>
+              <option value="2">2× · crisp enlargement</option>
+              <option value="4">4× · crisp enlargement</option>
+              <option value="8">8× · crisp enlargement</option>
+            </select></label
+          >
+          <div id="sheet-options" class="stack" hidden>
+            <label
+              >Frames
+              <select id="export-range">
+                <option value="all">All frames</option>
+              </select></label
+            ><label
+              >Columns
+              <input
+                id="export-columns"
+                type="number"
+                min="1"
+                max="256"
+                value="4" /></label
+            ><label
+              >Padding
+              <input
+                id="export-padding"
+                type="number"
+                min="0"
+                max="32"
+                value="0" /></label
+            ><label
+              >Spacing
+              <input
+                id="export-spacing"
+                type="number"
+                min="0"
+                max="32"
+                value="0"
+            /></label>
+          </div>
+          <p id="export-info"></p>
+          <small
+            >Transparent background. Guides and references stay in the
+            editor.</small
+          >
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <span id="export-error" class="error" role="status"></span
+        ><button id="download-art" class="primary">Download artwork ↗</button>
+      </div>
+    </dialog>
+    <dialog id="import-dialog">
+      <div class="dialog-heading">
+        <h2>Open PNG artwork</h2>
+        <button data-close aria-label="Close">×</button>
+      </div>
+      <div class="import-stage checker">
+        <canvas id="import-preview" aria-label="PNG slicing preview"></canvas>
+      </div>
+      <div class="stack">
+        <label
+          >Open as
+          <select id="import-type">
+            <option value="image">A single sprite</option>
+            <option value="sheet">Sprite sheet · slice into frames</option>
+          </select></label
+        >
+        <div id="import-slicing" class="row" hidden>
+          <label
+            >Width
+            <input
+              id="slice-width"
+              type="number"
+              min="1"
+              max="256"
+              value="32" /></label
+          ><label
+            >Height
+            <input
+              id="slice-height"
+              type="number"
+              min="1"
+              max="256"
+              value="32" /></label
+          ><label
+            >Margin
+            <input
+              id="slice-margin"
+              type="number"
+              min="0"
+              max="256"
+              value="0" /></label
+          ><label
+            >Spacing
+            <input id="slice-spacing" type="number" min="0" max="256" value="0"
+          /></label>
+        </div>
+        <p id="import-info"></p>
+      </div>
+      <div class="dialog-footer">
+        <span class="muted">Alpha preserved · row by row, left to right</span
+        ><button id="import-confirm" class="primary">Open in editor</button>
+      </div>
+    </dialog>
+    <dialog id="operation-dialog">
+      <div class="dialog-heading">
+        <h2 id="operation-title"></h2>
+        <button data-close aria-label="Close">×</button>
+      </div>
+      <div id="operation-content"></div>
+      <div class="dialog-footer">
+        <span id="operation-error" class="error" role="status"></span
+        ><button id="operation-apply" class="primary">Apply</button>
+      </div>
+    </dialog>
+    <dialog id="help-dialog">
+      <div class="dialog-heading">
+        <h2>Your quick guide</h2>
+        <button data-close aria-label="Close">×</button>
+      </div>
+      <div class="help-grid">
+        <div>
+          <h3>Make your first sprite</h3>
+          <p>
+            Start at 16 × 16 or 32 × 32. Draw a silhouette, fill it with a base
+            color, then add a shadow and a highlight.
+          </p>
+          <h3>Make mistakes freely</h3>
+          <p>
+            Undo restores a stroke, layer change, or frame edit. Layers keep
+            parts separate. A locked layer cannot be painted.
+          </p>
+          <h3>See the real size</h3>
+          <p>
+            Switch Preview to Native size. Try light and dark backgrounds to
+            check the outline.
+          </p>
+        </div>
+        <div>
+          <h3>Useful shortcuts</h3>
+          <p>
+            B Pencil · E Eraser · F Fill · I Pick color<br />V Select/move · H
+            Pan · L Line<br />Ctrl/Cmd Z Undo · Shift Z Redo<br />Ctrl/Cmd S
+            Download project<br />+ / − Zoom · Esc Cancel
+          </p>
+          <p>
+            Canvas keyboard drawing: arrow keys move, Space paints.
+            Middle-button drag pans. Scroll to zoom.
+          </p>
+          <h3>Keep your work</h3>
+          <p>
+            Autosave is on this device, not a cloud backup. Download a project
+            file to keep an editable copy. PNG exports flatten visible layers.
+          </p>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <span class="muted">A little practice goes a long way.</span
+        ><button data-close class="primary">Let's make something</button>
+      </div>
+    </dialog>
+    <input
+      id="file"
+      type="file"
+      accept="image/png,application/json,.json,.spriteforge"
+      hidden
+    /><input
+      id="reference-file"
+      type="file"
+      accept="image/png,image/jpeg,image/webp"
+      hidden
+    />
+    <script src="generator.js"></script>
+    <script src="studio-model.js"></script>
+    <script src="project-store.js"></script>
+    <script src="studio-art.js"></script>
+    <script src="studio-io.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

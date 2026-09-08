@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><title>Sprite Forge browser checks</title
+  ><style>
+    body {
+      font: 16px/1.6 system-ui;
+      background: #111513;
+      color: #edf2e9;
+      padding: 30px;
+    }
+    li {
+      margin: 10px 0;
+    }
+    .pass {
+      color: #c1ed91;
+    }
+    .fail {
+      color: #ffb3a5;
+    }
+  </style>
+  <h1>Sprite Forge browser checks</h1>
+  <p>
+    Run this page on a separate test origin. No existing project is overwritten.
+  </p>
+  <ol id="results"></ol>
+  <p id="summary">Running…</p>
+  <script src="../dist/studio-model.js"></script>
+  <script src="../dist/project-store.js"></script>
+  <script src="../dist/studio-art.js"></script>
+  <script src="../dist/studio-io.js"></script>
+  <script src="../dist/generator.js"></script>
+  <script src="browser-checks.js"></script>
+</html>
