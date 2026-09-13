@@ -2,7 +2,7 @@
 
 **A little canvas. Endless possibilities.**
 
-A welcoming, account-free pixel art studio. Start a small sprite, build a fantasy character, or open existing artwork. Draw, animate, and export entirely in your browser.
+A welcoming, account-free pixel art studio. Draw your own sprites and characters from a blank canvas, or open existing artwork. Draw, animate, and export entirely in your browser.
 
 Plain HTML, CSS, JavaScript, and Canvas. No build step, runtime dependencies, API keys, remote assets, or AI service.
 
@@ -21,7 +21,6 @@ The public site is hosted at [Sprite Forge on GitHub Pages](https://bitofastickl
 ## Start small
 
 - **Draw a sprite:** illustrated-purpose presets for 16, 32, 48, 64, 128, and 32 × 48; quick 8, 24, and 96 choices; custom width and height from 1 to 256 pixels. Starts with one layer and one frame.
-- **Build a character:** body, hair, outfit, headwear, equipment, and colors. Visual hair/outfit choices, character presets, and randomization locks. Generates 48 × 48 artwork in four walking directions with sixteen frames and nine editable part layers.
 - **Open artwork:** import PNG images, slice PNG sprite sheets, or reopen editable projects. Version 1 and 2 character JSON files are migrated; saved pixel drafts are retained even if the old file was in generator mode.
 - **Learn by making:** optional potion, creature, and sparkle lessons, plus editable examples and a repeating meadow tile.
 
@@ -55,7 +54,7 @@ Exports support integer enlargement. Sheets offer columns, padding, spacing, and
 
 GIF converts partial transparency to opaque/transparent, quantizes excess colors, and rounds timing to 10 ms. Its export preview shows the converted first frame. Use PNG for full RGBA fidelity. GIF encoding favors a simple dependency-free implementation over minimum file size.
 
-Generated character clips retain the original order: Down, Left, Up, Right, with four frames per direction. New projects and imported artwork are not restricted to that layout. Sheet metadata uses Sprite Forge's documented format, not an unverified named engine preset.
+Imported legacy character clips retain the original order: Down, Left, Up, Right, with four frames per direction. New projects and imported artwork are not restricted to that layout. Sheet metadata uses Sprite Forge's documented format, not an unverified named engine preset.
 
 ## Keep your work
 
@@ -75,7 +74,7 @@ The supported document budget is 2,097,152 pixels across all frame/layer combina
 | `dist/app.js` | UI interactions, drawing sessions, previews, import/export orchestration |
 | `dist/studio-model.js` | Version 3 model, RGBA operations, migration, history, layers, frames |
 | `dist/project-store.js` | IndexedDB persistence, previous revision, conflict copies |
-| `dist/generator.js` | Original procedural renderer and ordered part layers |
+| `dist/generator.js` | Compatibility renderer for importing legacy 48px character files |
 | `dist/studio-art.js` | Original starter art, lessons, Canvas pixel conversion |
 | `dist/studio-io.js` | ZIP and GIF encoders |
 | `dist/pixel-model.js` | Legacy model retained for compatibility regression tests |

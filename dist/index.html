@@ -6,9 +6,9 @@
     <title>Sprite Forge — A little canvas. Endless possibilities.</title>
     <meta
       name="description"
-      content="A welcoming pixel art studio. Draw sprites, build characters, animate, and export game-ready artwork. No account needed."
+      content="A welcoming pixel art studio. Draw your own sprites and characters, animate, and export game-ready artwork. No account needed."
     />
-    <link rel="stylesheet" href="style.css?v=canvas-20260913" />
+    <link rel="stylesheet" href="style.css?v=draw-20260913" />
   </head>
   <body>
     <header class="topbar">
@@ -61,10 +61,6 @@
           <span class="card-icon">✎</span
           ><strong>Draw a sprite <span>↗</span></strong
           ><span>Your idea, a blank canvas, and all the right tools.</span></button
-        ><button id="new-character" class="start-card">
-          <span class="card-icon">♟</span
-          ><strong>Build a character <span>↗</span></strong
-          ><span>Find your adventurer. Make every pixel your own.</span></button
         ><button id="open-artwork" class="start-card">
           <span class="card-icon">▧</span
           ><strong>Open artwork <span>↗</span></strong
@@ -367,9 +363,6 @@
               >Reference only · never exported or saved</small
             >
           </section>
-          <button id="generator-variant" hidden>
-            Build a new character variant
-          </button>
         </aside>
       </div>
       <div class="statusbar">
@@ -425,120 +418,6 @@
           ><button class="primary" type="submit">Create sprite ↗</button>
         </div>
       </form>
-    </dialog>
-    <dialog id="generator-dialog">
-      <div class="dialog-heading">
-        <div>
-          <p class="eyebrow">CHARACTER BUILDER</p>
-          <h2>Your next adventurer</h2>
-        </div>
-        <button data-close aria-label="Close">×</button>
-      </div>
-      <div class="generator-layout">
-        <div>
-          <div class="checker generator-stage">
-            <canvas
-              id="generator-preview"
-              width="48"
-              height="48"
-              aria-label="Generated character"
-            ></canvas>
-          </div>
-          <div class="row">
-            <button id="random-character">Randomize unlocked</button
-            ><select id="character-preset" aria-label="Character preset">
-              <option value="">Choose a preset…</option>
-              <option value="traveler">Traveler</option>
-              <option value="knight">Knight</option>
-              <option value="mage">Mage</option>
-            </select>
-          </div>
-          <p class="muted">48 × 48 · 4 directions · 16 walking frames</p>
-          <label
-            ><input id="lock-look" type="checkbox" /> Keep body & hair when
-            randomizing</label
-          ><label
-            ><input id="lock-colors" type="checkbox" /> Keep colors when
-            randomizing</label
-          >
-          <p class="muted">
-            Creates a new project. Your existing artwork stays in its own
-            project.
-          </p>
-        </div>
-        <div id="generator-controls">
-          <form id="controls">
-            <label
-              >Body build<select name="build">
-                <option value="standard">Standard</option>
-                <option value="slim">Slender</option>
-                <option value="broad">Broad</option>
-              </select></label
-            >
-            <div class="pair">
-              <label
-                >Skin<input name="skin" type="color" value="#dca477" /></label
-              ><label
-                >Eyes<input name="eyes" type="color" value="#315466"
-              /></label>
-            </div>
-            <label
-              >Hair style<select name="hair">
-                <option value="swept">Side swept</option>
-                <option value="short">Cropped</option>
-                <option value="long">Long</option>
-                <option value="mohawk">Mohawk</option>
-                <option value="bald">Bald</option>
-              </select></label
-            ><label class="color-row"
-              >Hair color<input name="hairColor" type="color" value="#543a34"
-            /></label>
-            <hr />
-            <label
-              >Outfit<select name="outfit">
-                <option value="tunic">Traveler's tunic</option>
-                <option value="armor">Plate armor</option>
-                <option value="robe">Mage's robe</option>
-              </select></label
-            >
-            <div class="pair">
-              <label
-                >Clothing<input
-                  name="cloth"
-                  type="color"
-                  value="#4a8e79" /></label
-              ><label
-                >Trim<input name="trim" type="color" value="#e5be70"
-              /></label>
-            </div>
-            <label
-              >Headwear<select name="hat">
-                <option value="none">None</option>
-                <option value="hood">Hood</option>
-                <option value="helmet">Iron helmet</option>
-                <option value="wizard">Wizard hat</option>
-              </select></label
-            ><label
-              >Equipment<select name="weapon">
-                <option value="none">Empty hands</option>
-                <option value="sword">Sword</option>
-                <option value="staff">Crystal staff</option>
-                <option value="axe">Axe</option>
-              </select></label
-            ><label class="check"
-              ><input name="cape" type="checkbox" /> Add a cape</label
-            ><label class="color-row"
-              >Cape color<input name="capeColor" type="color" value="#a54d5b"
-            /></label>
-          </form>
-        </div>
-      </div>
-      <div class="dialog-footer">
-        <span class="muted">Every generated pixel is editable.</span
-        ><button id="create-character" class="primary">
-          Make this character ↗
-        </button>
-      </div>
     </dialog>
     <dialog id="export-dialog">
       <div class="dialog-heading">
@@ -735,11 +614,11 @@
       accept="image/png,image/jpeg,image/webp"
       hidden
     />
-    <script src="generator.js?v=studio-20260908"></script>
-    <script src="studio-model.js?v=studio-20260908"></script>
-    <script src="project-store.js?v=studio-20260908"></script>
-    <script src="studio-art.js?v=studio-20260908"></script>
-    <script src="studio-io.js?v=studio-20260908"></script>
-    <script src="app.js?v=studio-20260908"></script>
+    <script src="generator.js?v=draw-20260913"></script>
+    <script src="studio-model.js?v=draw-20260913"></script>
+    <script src="project-store.js?v=draw-20260913"></script>
+    <script src="studio-art.js?v=draw-20260913"></script>
+    <script src="studio-io.js?v=draw-20260913"></script>
+    <script src="app.js?v=draw-20260913"></script>
   </body>
 </html>

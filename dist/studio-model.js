@@ -263,6 +263,11 @@ const StudioModel = (() => {
       weapon: ["none", "sword", "staff", "axe"],
     };
     const out = {};
+    if (r?.persona !== undefined) {
+      if (!["fallen", "imp", "witch", "brute", "wraith", "stag"].includes(r.persona))
+        throw Error("Invalid character type.");
+      out.persona = r.persona;
+    }
     for (const [key, values] of Object.entries(options)) {
       if (!values.includes(r?.[key])) throw Error("Invalid character recipe.");
       out[key] = r[key];

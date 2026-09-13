@@ -108,7 +108,8 @@
       );
     }
   });
-  await test("Native canvas layered character matches flattened rendering", () => {
+  await test("Legacy import renderer preserves layered character artwork", () => {
+    const size = 48;
     for (let d = 0; d < 4; d++)
       for (let f = 0; f < 4; f++) {
         const s = {
@@ -118,9 +119,9 @@
             hat: "wizard",
           },
           flat = document.createElement("canvas");
-        flat.width = flat.height = 48;
-        SpriteGenerator.draw(flat.getContext("2d"), s, d, f);
-        const p = M.blank(48, 48);
+        flat.width = flat.height = size;
+        SpriteGenerator.draw(flat.getContext("2d"), s, d, f, 0, 0, null, size);
+        const p = M.blank(size, size);
         p.layers = SpriteGenerator.parts.map((name) => ({
           id: M.uid(),
           name,
@@ -131,8 +132,8 @@
         }));
         p.frames[0].cels = SpriteGenerator.parts.map((part) => {
           const c = document.createElement("canvas");
-          c.width = c.height = 48;
-          SpriteGenerator.draw(c.getContext("2d"), s, d, f, 0, 0, part);
+          c.width = c.height = size;
+          SpriteGenerator.draw(c.getContext("2d"), s, d, f, 0, 0, part, size);
           return A.pixels(c);
         });
         const a = M.composite(p),

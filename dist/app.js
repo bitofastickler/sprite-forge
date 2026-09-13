@@ -508,7 +508,6 @@
       `${p.frames.length} frame${p.frames.length === 1 ? "" : "s"} · ${p.layers.length} layer${p.layers.length === 1 ? "" : "s"} · RGBA`;
     $("#undo").disabled = !doc.undoStack.length;
     $("#redo").disabled = !doc.redoStack.length;
-    $("#generator-variant").hidden = !p.recipe;
     $("#timeline").hidden = !timeline;
     $("#animate").textContent = timeline ? "Hide timeline" : "Animate";
     $("#duration").value = p.frames[fi].duration;
@@ -1437,10 +1436,10 @@
   }
   requestAnimationFrame(tick);
 
-  // Project creation and the generator share the same editor.
+  // Start original artwork on a blank canvas.
   const presets = [
     [16, 16, "Tiny icon", "A few pixels go a long way"],
-    [32, 32, "Sprite or prop", "A friendly place to start"],
+    [32, 32, "Character or prop", "A friendly place to start"],
     [48, 48, "Game character", "Room for a little detail"],
     [64, 64, "Portrait", "More room, more drawing"],
     [32, 48, "Tall character", "A rectangular canvas"],
@@ -1489,115 +1488,17 @@
           ),
         )),
   );
-  function recipe() {
-    const form = $("#controls");
-    return Object.fromEntries(
-      Object.keys(SpriteGenerator.defaults).map((k) => [
-        k,
-        form.elements[k].type === "checkbox"
-          ? form.elements[k].checked
-          : form.elements[k].value,
-      ]),
-    );
-  }
-  function setRecipe(s) {
-    const form = $("#controls");
-    for (const k of Object.keys(SpriteGenerator.defaults)) {
-      if (form.elements[k].type === "checkbox") form.elements[k].checked = s[k];
-      else form.elements[k].value = s[k];
-    }
-    renderGenerator();
-  }
-  function renderGenerator() {
-    const c = $("#generator-preview").getContext("2d");
-    c.clearRect(0, 0, 48, 48);
-    SpriteGenerator.draw(c, recipe(), 0, 0);
-  }
-  $("#controls").oninput = renderGenerator;
-  function openGenerator() {
-    setRecipe(doc?.project.recipe || SpriteGenerator.defaults);
-    showDialog("#generator-dialog");
-  }
-  $("#new-character").onclick = openGenerator;
-  $("#generator-variant").onclick = openGenerator;
-  $("#random-character").onclick = () => {
-    const s = recipe(),
-      form = $("#controls");
-    for (const k of ["build", "hair", "outfit", "hat", "weapon"]) {
-      if ($("#lock-look").checked && ["build", "hair"].includes(k)) continue;
-      const options = [...form.elements[k].options];
-      s[k] = options[Math.floor(Math.random() * options.length)].value;
-    }
-    s.cape = Math.random() > 0.5;
-    if (!$("#lock-colors").checked) {
-      const pal = Object.values(M.PALETTES)[Math.floor(Math.random() * 4)];
-      s.cloth = pal[2];
-      s.trim = pal[4];
-      s.capeColor = pal[6];
-      s.skin = ["#efc49b", "#dca477", "#aa704d", "#754d3e"][
-        Math.floor(Math.random() * 4)
-      ];
-      s.hairColor = ["#543a34", "#b1864d", "#d5ccaa", "#292a37", "#88463b"][
-        Math.floor(Math.random() * 5)
-      ];
-    }
-    setRecipe(s);
-  };
-  $("#character-preset").onchange = (e) => {
-    const s = { ...SpriteGenerator.defaults };
-    if (e.target.value === "knight")
-      Object.assign(s, {
-        outfit: "armor",
-        hat: "helmet",
-        weapon: "sword",
-        cape: true,
-      });
-    if (e.target.value === "mage")
-      Object.assign(s, {
-        outfit: "robe",
-        hat: "wizard",
-        weapon: "staff",
-        cloth: "#786199",
-      });
-    setRecipe(s);
-  };
-  function generate(s, layered = false) {
+  // Only old recipe-only files need rendering. New work starts with blank pixels.
+  function renderLegacyProject(s) {
     const c = document.createElement("canvas");
     c.width = c.height = 48;
     const ctx = c.getContext("2d");
-    return Array.from({ length: 16 }, (_, i) => ({
-      id: M.uid(),
-      duration: 167,
-      cels: (layered ? SpriteGenerator.parts : [null]).map((part) => {
-        ctx.clearRect(0, 0, 48, 48);
-        SpriteGenerator.draw(ctx, s, Math.floor(i / 4), i % 4, 0, 0, part);
-        return A.pixels(c);
-      }),
-    }));
+    return Array.from({ length: 16 }, (_, i) => {
+      ctx.clearRect(0, 0, 48, 48);
+      SpriteGenerator.draw(ctx, s, Math.floor(i / 4), i % 4);
+      return { id: M.uid(), duration: 167, cels: [A.pixels(c)] };
+    });
   }
-  $("#create-character").onclick = safe(async () => {
-    const p = M.blank(48, 48, "My adventurer");
-    p.recipe = recipe();
-    p.frames = generate(p.recipe, true);
-    p.layers = SpriteGenerator.parts.map((name) => ({
-      id: M.uid(),
-      name,
-      visible: true,
-      locked: false,
-      alphaLock: false,
-      opacity: 1,
-    }));
-    p.clips = ["Down", "Left", "Up", "Right"].map((name, i) => ({
-      name: `Walk ${name}`,
-      frames: p.frames.slice(i * 4, i * 4 + 4).map((f) => f.id),
-    }));
-    p.palette = M.extract(p);
-    $("#generator-dialog").close();
-    await switchProject(p);
-    li = 2;
-    $("#clip").value = "0";
-    refresh();
-  });
   for (const [key, s] of Object.entries(A.samples)) {
     const b = button("", () => openExample(key), { class: "example-card" }),
       art = document.createElement("div"),
@@ -2210,12 +2111,12 @@
       renderImport();
     } else {
       const raw = JSON.parse(await f.text()),
-        p = M.migrate(raw, generate);
+        p = M.migrate(raw, renderLegacyProject);
       p.id = M.uid();
       await switchProject(p);
       message(
         raw.version < 3
-          ? "Legacy project imported. Pixel draft and generator recipe preserved."
+          ? "Legacy artwork imported. Your saved pixels are preserved."
           : "Project opened as a new copy.",
       );
     }
@@ -2412,29 +2313,6 @@
     { id: "set-origin" },
   );
   $(".rail-bottom").append(originButton);
-  for (const key of ["hair", "outfit"]) {
-    const select = $(`#controls select[name="${key}"]`),
-      choices = document.createElement("div");
-    choices.className = "part-choices";
-    choices.setAttribute("aria-label", `${key} previews`);
-    for (const option of select.options) {
-      const c = document.createElement("canvas");
-      c.width = c.height = 48;
-      const s = { ...SpriteGenerator.defaults, [key]: option.value };
-      SpriteGenerator.draw(c.getContext("2d"), s, 0, 0);
-      const b = button(
-        "",
-        () => {
-          select.value = option.value;
-          renderGenerator();
-        },
-        { "aria-label": `Choose ${option.textContent}` },
-      );
-      b.append(c, option.textContent);
-      choices.append(b);
-    }
-    select.parentElement.after(choices);
-  }
   let gesture = null;
   viewport.addEventListener(
     "touchstart",
@@ -2480,6 +2358,5 @@
   viewport.addEventListener("touchcancel", () => {
     gesture = null;
   });
-  renderGenerator();
   recent();
 })();

@@ -293,7 +293,7 @@ small,
 }
 .start-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 .start-card {
@@ -821,12 +821,6 @@ summary {
   max-height: 160px;
   object-fit: contain;
 }
-#generator-variant {
-  width: 100%;
-  font-size: 10px;
-  margin-top: 15px;
-  white-space: normal;
-}
 #timeline {
   background: var(--panel);
   border-top: 1px solid var(--line);
@@ -999,65 +993,6 @@ dialog::backdrop {
 #custom-size label {
   flex-direction: column;
   align-items: flex-start;
-}
-.generator-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 25px;
-}
-.generator-stage {
-  height: 235px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 14px;
-  border-radius: 8px;
-}
-.generator-stage canvas {
-  width: 192px;
-  height: 192px;
-}
-.generator-layout .row > * {
-  font-size: 10px;
-}
-.generator-layout p,
-.generator-layout > div > label {
-  font-size: 11px;
-  margin: 10px 0;
-}
-.generator-layout form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.generator-layout form > label:not(.check) {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-.generator-layout .pair {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.generator-layout .pair label {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-.generator-layout input[type="color"] {
-  height: 28px;
-  width: 100%;
-}
-.generator-layout select {
-  font-size: 11px;
-  padding: 5px;
-}
-.generator-layout hr {
-  border: 0;
-  border-top: 1px solid var(--line);
-  width: 100%;
-  margin: 3px 0;
 }
 .export-layout {
   display: grid;
@@ -1424,17 +1359,9 @@ dialog::backdrop {
   .preset-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .generator-layout,
   .export-layout,
   .help-grid {
     grid-template-columns: 1fr;
-  }
-  .generator-stage {
-    height: 180px;
-  }
-  .generator-stage canvas {
-    width: 144px;
-    height: 144px;
   }
   .export-stage {
     min-height: 150px;
@@ -1494,35 +1421,6 @@ dialog::backdrop {
 #selection-bar button {
   font-size: 11px;
 }
-.generator-layout {
-  max-height: calc(80dvh - 180px);
-}
-.generator-layout > div {
-  overflow: auto;
-  min-height: 0;
-}
-.generator-layout #generator-controls {
-  padding-right: 6px;
-}
-.part-choices {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
-  margin: 7px 0;
-}
-.part-choices button {
-  padding: 4px;
-  font-size: 10px;
-  white-space: normal;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 3px;
-}
-.part-choices canvas {
-  width: 40px;
-  height: 40px;
-}
 .tool-symbol svg {
   display: block;
   width: 21px;
@@ -1554,12 +1452,6 @@ dialog::backdrop {
   }
 }
 @media (max-width: 600px) {
-  .generator-layout {
-    max-height: none;
-  }
-  .generator-layout > div {
-    overflow: visible;
-  }
   .toolrail button[data-tool],
   .rail-bottom button {
     font-size: 10px;

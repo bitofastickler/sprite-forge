@@ -4,8 +4,8 @@ const assert = require("node:assert/strict"),
   G = require("../dist/generator.js"),
   old = require("./legacy-generator.cjs");
 // Minimal integer rectangle rasterizer exercises the procedural renderer without a browser.
-function context() {
-  const pixels = new Uint32Array(2304),
+function context(size = 48, strict = false) {
+  const pixels = new Uint32Array(size * size),
     stack = [];
   let sx = 1,
     sy = 1,
@@ -33,17 +33,21 @@ function context() {
         xb = ox + (x + w) * sx,
         ya = oy + y * sy,
         yb = oy + (y + h) * sy;
+      if (strict) {
+        assert([xa, xb, ya, yb].every(Number.isInteger), "Non-integer edge");
+        assert(Math.min(xa, xb, ya, yb) >= 0 && Math.max(xa, xb, ya, yb) <= size, "Clipped character mark");
+      }
       for (
         let b = Math.max(0, Math.min(ya, yb));
-        b < Math.min(48, Math.max(ya, yb));
+        b < Math.min(size, Math.max(ya, yb));
         b++
       )
         for (
           let a = Math.max(0, Math.min(xa, xb));
-          a < Math.min(48, Math.max(xa, xb));
+          a < Math.min(size, Math.max(xa, xb));
           a++
         )
-          pixels[b * 48 + a] = M.rgba(this.fillStyle);
+          pixels[b * size + a] = M.rgba(this.fillStyle);
     },
   };
 }

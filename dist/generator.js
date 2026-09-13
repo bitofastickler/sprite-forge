@@ -1,4 +1,5 @@
 "use strict";
+// Compatibility renderer for saved V1/V2 character files; no generator UI.
 const SpriteGenerator = (() => {
   const defaults = {
     build: "standard",

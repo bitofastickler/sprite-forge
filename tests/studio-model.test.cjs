@@ -179,6 +179,19 @@ test("v1 migration uses renderer without altering recipe", () => {
   assert.deepEqual(used, recipe);
   assert.equal(p.frames.length, 16);
 });
+test("character identities survive project round trips and reject unknown types", () => {
+  for (const persona of ["fallen", "imp", "witch", "brute", "wraith", "stag"]) {
+    for (const size of [32, 48]) {
+      const p = M.blank(size, size);
+      p.recipe = { ...recipe, persona };
+      const loaded = M.validate(M.serialize(p));
+      assert.deepEqual(loaded.recipe, p.recipe);
+    }
+  }
+  const p = M.blank();
+  p.recipe = { ...recipe, persona: "unknown" };
+  assert.throws(() => M.validate(M.serialize(p)), /character type/);
+});
 test("malformed files and allocations are rejected before replacement", () => {
   const p = M.serialize(M.blank());
   for (const mutate of [
