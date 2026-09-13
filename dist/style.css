@@ -9,8 +9,8 @@
   --ink: #edf2e9;
   --accent: #c1ed91;
   --accent-ink: #223214;
-  --checker-a: #222925;
-  --checker-b: #2b342e;
+  --checker-a: #a8a8a8;
+  --checker-b: #b8b8b8;
   --danger: #ffb3a5;
   --shadow: 0 24px 80px #0005;
   font:
@@ -31,8 +31,6 @@
   --ink: #233020;
   --accent: #3e681e;
   --accent-ink: #fff;
-  --checker-a: #e4e8de;
-  --checker-b: #d5dccd;
   --danger: #a5342b;
   --shadow: 0 24px 80px #22321422;
 }
